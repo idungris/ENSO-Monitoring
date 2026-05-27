@@ -1,0 +1,33 @@
+name: Update ENSO Dashboard
+
+on:
+  schedule:
+    # Jam 06:00 WIB = 23:00 UTC (WIB itu UTC+7)
+    - cron: '0 23 * * *'
+  workflow_dispatch:  # Biar bisa dijalankan manual juga
+
+jobs:
+  run-dashboard:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          pip install xarray netcdf4 matplotlib pandas numpy folium branca
+        
+      - name: Run dashboard script
+        run: python dashboard.py
+        
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output
+          publish_branch: gh-pages
